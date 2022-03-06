@@ -6,7 +6,7 @@ const userRoute = require('./user.route');
 // combining all custom routes
 const combineRoutes = app => {
     app.use("/api/validation", validationRoute);
-    app.use("/api/auth/login", authRoute);
+    app.use("/api/auth", authRoute);
     app.use("/api/users", userRoute);
 };
 
