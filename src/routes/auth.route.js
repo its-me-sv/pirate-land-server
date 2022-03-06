@@ -4,7 +4,7 @@ const bcrypt = require("bcrypt");
 
 // custom
 const client = require("../utils/astra-database.util");
-const {isUserLoggedIn, generateAccessToken, generateRefreshToken} = require("../utils/jwt.util");
+const {isUserLoggedIn, generateAccessToken, generateRefreshToken, removeUser} = require("../utils/jwt.util");
 
 // logging in the user
 router.post("/login", async (req, res) => {
@@ -40,6 +40,21 @@ router.post("/refresh", async (req, res) => {
         if (!token)
             return res.status(400).json("Cannot refresh token");
         return res.status(200).json({token});
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json(err);
+    }
+});
+
+// logging out user
+router.delete("/logout", async (req, res) => {
+    const {userId} = req;
+    try {
+        const isLogged = await isUserLoggedIn(userId);
+        if (!isLogged)
+            return res.status(400).json("Not logged in");
+        await removeUser(userId);
+        return res.status(200).json("Logged out successfully");
     } catch (err) {
         console.log(err);
         return res.status(500).json(err);
