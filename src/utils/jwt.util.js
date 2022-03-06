@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 // endpoints that need not require token
 const whitelist = [
     "/api/validation/server",
+    "/api/validation/db",
     "/api/users/create",
 ];
 
