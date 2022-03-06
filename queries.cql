@@ -7,6 +7,7 @@ CREATE TABLE users (
     current_game UUID,
     PRIMARY KEY (username, id)
 );
+CREATE CUSTOM INDEX users_id_index on users (id) USING 'StorageAttachedIndex';
 CREATE TABLE tokens (
     id UUID,
     tkn TEXT,

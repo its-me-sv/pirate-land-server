@@ -27,7 +27,7 @@ router.post("/login", async (req, res) => {
           return res.status(400).json("Already logged in");
 
         const sessionToken = await generateAccessToken(user.id);
-        return res.status(200).json({id: user.id, token: sessionToken, username});
+        return res.status(200).json({id: user.id, token: sessionToken});
     } catch (err) {
         return res.status(500).json(err);
     }
