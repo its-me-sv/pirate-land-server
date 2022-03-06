@@ -5,7 +5,7 @@ CREATE TABLE users (
     password_hash TEXT,
     created_at TIMEUUID,
     current_game UUID,
-    PRIMARY KEY ((id, username))
+    PRIMARY KEY (username, id)
 );
 CREATE TABLE tokens (
     id UUID,

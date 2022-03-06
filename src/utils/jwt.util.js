@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 const whitelist = [
     "/api/validation/server",
     "/api/validation/db",
+    "/api/auth/login",
     "/api/users/create",
 ];
 
