@@ -16,8 +16,9 @@ CREATE TABLE tokens (
 CREATE TABLE sockets (
     id UUID,
     socket_id TEXT,
-    PRIMARY KEY ((id, socket_id))
+    PRIMARY KEY (id)
 );
+CREATE CUSTOM INDEX sockets_socket_id_index on sockets (socket_id) USING 'StorageAttachedIndex';
 CREATE TABLE games (
     id UUID,
     team1 UUID,
