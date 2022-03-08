@@ -11,7 +11,7 @@ router.post("/login", async (req, res) => {
     try {
         const {username, password} = req.body;
 
-        const QUERY1 = `SELECT id, password_hash FROM users WHERE username = ?`;
+        const QUERY1 = `SELECT id, password_hash, current_game FROM users WHERE username = ?`;
         const VALUES1 = [username];
 
         const result1 = await client.execute(QUERY1, VALUES1);
@@ -27,7 +27,11 @@ router.post("/login", async (req, res) => {
           return res.status(400).json("Already logged in");
 
         const sessionToken = await generateAccessToken(user.id);
-        return res.status(200).json({id: user.id, token: sessionToken});
+        return res.status(200).json({ 
+            id: user.id, 
+            token: sessionToken, 
+            currentGame: user.current_game || ''
+        });
     } catch (err) {
         return res.status(500).json(err);
     }
