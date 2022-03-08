@@ -78,4 +78,17 @@ router.put("/update", async (req, res) => {
   }
 });
 
+// games played by user
+router.post("/games", async (req, res) => {
+  const {id} = req.body;
+  const QUERY = `SELECT games FROM users WHERE id = ?;`;
+  const VALUES = [id];
+  try {
+    const {rows} = await client.execute(QUERY, VALUES);
+    return res.status(200).json(rows[0]);
+  } catch (err) {
+    return res.status(500).json(err);
+  }
+});
+
 module.exports = router;

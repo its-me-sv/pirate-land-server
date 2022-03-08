@@ -7,6 +7,7 @@ CREATE TABLE users (
     current_game UUID,
     PRIMARY KEY (username, id)
 );
+ALTER TABLE users ADD games LIST<TIMEUUID>;
 CREATE CUSTOM INDEX users_id_index on users (id) USING 'StorageAttachedIndex';
 CREATE TABLE tokens (
     id UUID,
@@ -20,12 +21,11 @@ CREATE TABLE sockets (
 );
 CREATE CUSTOM INDEX sockets_socket_id_index on sockets (socket_id) USING 'StorageAttachedIndex';
 CREATE TABLE games (
-    id UUID,
+    id TIMEUUID,
     team1 UUID,
     team2 UUID,
     is_ended BOOLEAN,
     chance_of UUID,
-    created_at TIMEUUID,
     PRIMARY KEY (id)
 );
 CREATE TABLE teams (
@@ -53,7 +53,7 @@ CREATE TYPE score (
     caught INT
 );
 CREATE TABLE scoreboards (
-    id UUID,
+    id TIMEUUID,
     team1 LIST<FROZEN<score>>,
     team2 LIST<FROZEN<score>>,
     created_at TIMEUUID,
