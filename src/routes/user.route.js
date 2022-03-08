@@ -91,4 +91,19 @@ router.post("/games", async (req, res) => {
   }
 });
 
+// check is game played by user
+router.post("/check_game", async (req, res) => {
+  const {gameId} = req.body;
+  const QUERY = `SELECT games FROM users WHERE id = ?;`;
+  const VALUES = [req.userId];
+  try {
+    const {rows} = await client.execute(QUERY, VALUES);
+    const {games} = JSON.parse(JSON.stringify(rows[0]));
+    return res.status(200).json({canShow: games.includes(gameId)});
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json(err);
+  }
+});
+
 module.exports = router;

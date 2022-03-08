@@ -9,6 +9,7 @@ CREATE TABLE users (
 );
 ALTER TABLE users ADD games LIST<TIMEUUID>;
 CREATE CUSTOM INDEX users_id_index on users (id) USING 'StorageAttachedIndex';
+CREATE CUSTOM INDEX users_games_index on users (games) USING 'StorageAttachedIndex';
 CREATE TABLE tokens (
     id UUID,
     tkn TEXT,
