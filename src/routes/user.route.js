@@ -54,8 +54,11 @@ router.post("/name", async (req, res) => {
 
 // update user
 router.put("/update", async (req, res) => {
-  const {username, id, name, password} = req.body;
+  const {id, name, password} = req.body;
   try {
+    const BQ = `SELECT username FROM users WHERE id = ?;`;
+    const BV = [id];
+    const username = (await client.execute(BQ, BV)).rows[0].username;
     if (name?.length > 0) {
       const QUERY = `UPDATE users SET name = ? WHERE username = ? AND id = ?;`;
       const VALUES = [name, username, id];
