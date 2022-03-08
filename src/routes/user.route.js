@@ -52,4 +52,27 @@ router.post("/name", async (req, res) => {
   }
 });
 
+// update user
+router.put("/update", async (req, res) => {
+  const {username, id, name, password} = req.body;
+  try {
+    if (name?.length > 0) {
+      const QUERY = `UPDATE users SET name = ? WHERE username = ? AND id = ?;`;
+      const VALUES = [name, username, id];
+      await client.execute(QUERY, VALUES);
+    }
+    if (password?.length > 0) {
+      const salt = await bcrypt.genSalt(+process.env.SALT);
+      const hashedPassword = await bcrypt.hash(password, salt);
+      const QUERY = `UPDATE users SET password_hash = ? WHERE username = ? AND id = ?;`;
+      const VALUES = [hashedPassword, username, id];
+      await client.execute(QUERY, VALUES);
+    }
+    return res.status(200).json("Account updated successfully");
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json(err);
+  }
+});
+
 module.exports = router;
