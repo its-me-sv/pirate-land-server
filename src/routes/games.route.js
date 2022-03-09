@@ -28,7 +28,7 @@ router.post(`/create`, async (req, res) => {
         `;
         VALUE = [gameId, creatorId, team1Id, team2Id];
         await client.execute(QUERY, VALUE);
-        return res.status(200).json({gameId, creatorId, team1Id, team2Id});
+        return res.status(200).json({gameId});
     } catch (err) {
         return res.status(400).json(err);
     }
