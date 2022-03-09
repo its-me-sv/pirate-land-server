@@ -34,4 +34,21 @@ router.post(`/create`, async (req, res) => {
     }
 });
 
+// check to join room
+router.post(`/check_join`, async (req, res) => {
+    try {
+        const {gameId} = req.body;
+        const QUERY = `SELECT is_ended, launched FROM games WHERE id = ?;`;
+        const VALUE = [gameId];
+        const {rowLength, rows} = await client.execute(QUERY, VALUE);
+        if (!rowLength) return res.status(400).json("Island doesn't exist");
+        const {is_ended, launched} = rows[0];
+        if (is_ended) return res.status(400).json("Island has been closed");
+        if (launched) return res.status(400).json("Island has already been occupied");
+        return res.status(200).json({gameId});
+    } catch (err) {
+        return res.status(500).json(err);
+    }
+});
+
 module.exports = router;
