@@ -60,4 +60,28 @@ router.post(`/check_join`, async (req, res) => {
     }
 });
 
+// game details for lobby
+router.post(`/for_lobby`, async (req, res) => {
+    try {
+        const {gameId} = req.body;
+        
+        let QUERY = `SELECT id, creator, launched, team1, team2 FROM games WHERE id = ?;`;
+        let VALUE = [gameId];
+        const game = (await client.execute(QUERY, VALUE)).rows[0];
+
+        QUERY = `SELECT players FROM teams WHERE id = ?;`;
+        VALUE = [game.team1];
+        const team1 = (await client.execute(QUERY, VALUE)).rows[0].players || [];
+        
+        QUERY = `SELECT players FROM teams WHERE id = ?;`;
+        VALUE = [game.team2];
+        const team2 = (await client.execute(QUERY, VALUE)).rows[0].players || [];
+
+        return res.status(200).json({...game, team1, team2});
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json(err);
+    }
+});
+
 module.exports = router;

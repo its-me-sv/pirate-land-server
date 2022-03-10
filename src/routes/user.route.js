@@ -116,6 +116,23 @@ router.post("/current_game", async (req, res) => {
   } catch (err) {
     return res.status(500).json(err);
   }
-})
+});
+
+// set current game of user
+router.put("/set_current_game", async (req, res) => {
+  const id = req.userId;
+  const {gameId} = req.body;
+  try {
+    const BQ = `SELECT username FROM users WHERE id = ?;`;
+    const BV = [id];
+    const username = (await client.execute(BQ, BV)).rows[0].username;
+    const QUERY = `UPDATE users SET current_game = ? WHERE username = ? AND id = ?;`;
+    const VALUES = [gameId, username, id];
+    await client.execute(QUERY, VALUES);
+    return res.status(200).json("Updated current game successfully");
+  } catch (err) {
+    return res.status(500).json(err);
+  }
+});
 
 module.exports = router;
