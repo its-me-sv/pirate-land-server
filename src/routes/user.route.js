@@ -48,6 +48,7 @@ router.post("/name", async (req, res) => {
       return res.status(400).json("Account not found");
     return res.status(200).json(rows[0]);
   } catch (err) {
+    console.log(err);
     return res.status(500).json(err);
   }
 });
