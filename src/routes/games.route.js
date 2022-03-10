@@ -118,13 +118,14 @@ router.put(`/leave_team`, async (req, res) => {
         const teamId = teamNo == "Team 1" ? game.team1 : game.team2;
         QUERY = `SELECT players FROM teams WHERE id = ?;`;
         VALUE = [teamId];
-        const allPlayers = (await client.execute(QUERY, VALUE)).rows[0].players;
+        const allPlayers = (await client.execute(QUERY, VALUE)).rows[0].players || [];
         QUERY = `UPDATE teams SET players = ? WHERE id = ?;`;
         VALUE = [allPlayers.filter(v => v != userId), teamId];
         await client.execute(QUERY, VALUE);
 
         return res.status(200).json("Exited room successfully");
     } catch (err) {
+        console.log(err);
         return res.status(500).json(err);
     }
 });
