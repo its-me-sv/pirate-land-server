@@ -84,4 +84,49 @@ router.post(`/for_lobby`, async (req, res) => {
     }
 });
 
+// join a team
+router.put(`/join_team`, async (req, res) => {
+    try {
+        const {gameId, teamNo} = req.body;
+        const {userId} = req;
+
+        let QUERY = `SELECT team1, team2 FROM games WHERE id = ?;`;
+        let VALUE = [gameId];
+        const game = (await client.execute(QUERY, VALUE)).rows[0];
+
+        const teamId = teamNo == "Team 1" ? game.team1 : game.team2;
+        QUERY = `UPDATE teams SET players = players + ? WHERE id = ?;`;
+        VALUE = [[userId], teamId];
+        await client.execute(QUERY, VALUE);
+
+        return res.status(200).json("Joined room successfully");
+    } catch (err) {
+        return res.status(500).json(err);
+    }
+});
+
+// leave a team
+router.put(`/leave_team`, async (req, res) => {
+    try {
+        const {gameId, teamNo} = req.body;
+        const {userId} = req;
+
+        let QUERY = `SELECT team1, team2 FROM games WHERE id = ?;`;
+        let VALUE = [gameId];
+        const game = (await client.execute(QUERY, VALUE)).rows[0];
+
+        const teamId = teamNo == "Team 1" ? game.team1 : game.team2;
+        QUERY = `SELECT players FROM teams WHERE id = ?;`;
+        VALUE = [teamId];
+        const allPlayers = (await client.execute(QUERY, VALUE)).rows[0].players;
+        QUERY = `UPDATE teams SET players = ? WHERE id = ?;`;
+        VALUE = [allPlayers.filter(v => v != userId), teamId];
+        await client.execute(QUERY, VALUE);
+
+        return res.status(200).json("Exited room successfully");
+    } catch (err) {
+        return res.status(500).json(err);
+    }
+});
+
 module.exports = router;
