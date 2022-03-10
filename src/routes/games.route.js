@@ -38,13 +38,22 @@ router.post(`/create`, async (req, res) => {
 router.post(`/check_join`, async (req, res) => {
     try {
         const {gameId} = req.body;
-        const QUERY = `SELECT is_ended, launched FROM games WHERE id = ?;`;
-        const VALUE = [gameId];
+        let QUERY = `SELECT is_ended, launched, team1, team2 FROM games WHERE id = ?;`;
+        let VALUE = [gameId];
         const {rowLength, rows} = await client.execute(QUERY, VALUE);
         if (!rowLength) return res.status(400).json("Island doesn't exist");
         const {is_ended, launched} = rows[0];
         if (is_ended) return res.status(400).json("Island has been closed");
         if (launched) return res.status(400).json("Island has already been occupied");
+        const {team1, team2} = rows[0];
+        QUERY = `SELECT players FROM teams WHERE id = ?;`;
+        VALUE = [team1];
+        const t1Players = (await client.execute(QUERY, VALUE)).rows[0].players;
+        QUERY = `SELECT players FROM teams WHERE id = ?;`;
+        VALUE = [team2];
+        const t2Players = (await client.execute(QUERY, VALUE)).rows[0].players;
+        if (t1Players?.length + t2Players?.length == 8)
+          return res.status(400).json("Island full of players, try after some time");
         return res.status(200).json({gameId});
     } catch (err) {
         return res.status(500).json(err);
