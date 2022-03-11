@@ -30,6 +30,17 @@ const unRegisterSocket = async (socketId) => {
     }
 };
 
+// destroy game when hostleft
+const destroyGame = async (gameId) => {
+    const QUERY = `DELETE FROM games WHERE id = ?;`;
+    const VALUE = [gameId];
+    try {
+        await client.execute(QUERY, VALUE);
+    } catch (err) {
+        console.log(err);
+    }
+}
+
 const socketHandler = io => {
     // user logs in
     io.on("connection", socket => {
@@ -55,6 +66,12 @@ const socketHandler = io => {
         socket.on("updateRoom", roomId => {
             socket.broadcast.to(roomId).emit("updateRoom");
             console.log(`[SERVER] ${socket.id} updates ${roomId}`);
+        });
+        // host user leaves game
+        socket.on("hostLeft", roomId => {
+            socket.broadcast.to(roomId).emit("hostLeft");
+            console.log(`[SERVER] Host left ${roomId}`);
+            destroyGame(roomId.replace('LOBBY:', ''));
         });
     });
 };
