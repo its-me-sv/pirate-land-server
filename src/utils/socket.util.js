@@ -32,9 +32,18 @@ const unRegisterSocket = async (socketId) => {
 
 // destroy game when hostleft
 const destroyGame = async (gameId) => {
-    const QUERY = `DELETE FROM games WHERE id = ?;`;
-    const VALUE = [gameId];
+    let QUERY = `SELECT team1, team2 FROM games WHERE id = ?;`;
+    let VALUE = [gameId];
     try {
+        const game = (await client.execute(QUERY, VALUE)).rows[0];
+        QUERY = `DELETE FROM teams WHERE id = ?;`;
+        VALUE = [game.team1];
+        await client.execute(QUERY, VALUE);
+        QUERY = `DELETE FROM teams WHERE id = ?;`;
+        VALUE = [game.team2];
+        await client.execute(QUERY, VALUE);
+        QUERY = `DELETE FROM games WHERE id = ?;`;
+        VALUE = [gameId];
         await client.execute(QUERY, VALUE);
     } catch (err) {
         console.log(err);
