@@ -31,13 +31,30 @@ const unRegisterSocket = async (socketId) => {
 };
 
 const socketHandler = io => {
+    // user logs in
     io.on("connection", socket => {
         console.log(`[SERVER] ${socket.id} Connected`);
         const {userId} = socket.handshake.query;
         registerSocket(userId, socket.id);
+        // user leaves tab or logs out
         socket.on("disconnect", () => {
             console.log(`[SERVER] ${socket.id} Disconnected`);
             unRegisterSocket(socket.id);
+        });
+        // user joins room
+        socket.on("joinRoom", roomId => {
+            socket.join(roomId);
+            console.log(`[SERVER] ${socket.id} joined ${roomId}`);
+        });
+        // user leaves room
+        socket.on("leaveRoom", roomId => {
+            socket.leave(roomId);
+            console.log(`[SERVER] ${socket.id} left ${roomId}`);
+        });
+        // user updates room
+        socket.on("updateRoom", roomId => {
+            socket.broadcast.to(roomId).emit("updateRoom");
+            console.log(`[SERVER] ${socket.id} updates ${roomId}`);
         });
     });
 };
