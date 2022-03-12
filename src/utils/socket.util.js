@@ -50,6 +50,7 @@ const destroyGame = async (gameId) => {
     }
 }
 
+// handling sockets
 const socketHandler = io => {
     // user logs in
     io.on("connection", socket => {
@@ -82,6 +83,11 @@ const socketHandler = io => {
             console.log(`[SERVER] Host left ${roomId}`);
             destroyGame(roomId.replace('LOBBY:', ''));
         });
+        // host launched game
+        socket.on("gameLaunched", roomId => {
+            socket.broadcast.to(roomId).emit("gameLaunched");
+            console.log(`[SERVER] ${socket.id} launched in ${roomId}`);
+        })
     });
 };
 

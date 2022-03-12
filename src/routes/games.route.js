@@ -130,4 +130,17 @@ router.put(`/leave_team`, async (req, res) => {
     }
 });
 
+// launch game
+router.put(`/launch_game`, async (req, res) => {
+    try {
+        const {gameId} = req.body;
+        const QUERY = `UPDATE games SET launched = true WHERE id = ?`;
+        const VALUE = [gameId];
+        await client.execute(QUERY, VALUE);
+        return res.status(200).json("Launched game successfully");
+    } catch (err) {
+        return res.status(500).json(err);
+    }
+});
+
 module.exports = router;
