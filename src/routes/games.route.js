@@ -152,10 +152,13 @@ router.put(`/launch_game`, async (req, res) => {
         VALUE = [gameId, t1s, t2s];
         await client.execute(QUERY, VALUE, {prepare: true});
         // create the boards
+        const newBoard = new Array(135).fill(0).join();
         QUERY = `INSERT INTO boards (id, board) VALUES (?, ?);`;
-        VALUE = [t1id];
+        VALUE = [t1id, newBoard];
         await client.execute(QUERY, VALUE);
-        VALUE = [t2id];
+        VALUE = [t2id, newBoard];
+        await client.execute(QUERY, VALUE);
+        VALUE = [gameId, newBoard];
         await client.execute(QUERY, VALUE);
         // update the game
         QUERY = `UPDATE games SET initial = true, launched = true, chance_off = 0, players = ? WHERE id = ?`;
@@ -171,7 +174,24 @@ router.put(`/launch_game`, async (req, res) => {
 // initial fetch for game
 router.post(`/init_fetch`, async (req, res) => {
     try {
+        const {gameId, team} = req.body;
+        let QUERY = `SELECT chance_off, players, team1, team2, initial FROM games WHERE id = ?;`;
+        let VALUE = [gameId];
+        const game = (await client.execute(QUERY, VALUE)).rows[0];
 
+        const responseBody = {};
+        responseBody["currPlayer"] = game.chance_off;
+        responseBody["players"] = game.players;
+        responseBody["initial"] = game.initial;
+        if (team === 'Team 1') {
+            responseBody["currTeamId"] = game.team1;
+            responseBody["oppTeamId"] = game.team2;
+        } else {
+            responseBody["currTeamId"] = game.team2;
+            responseBody["oppTeamId"] = game.team1;
+        }
+        
+        return res.status(200).json(responseBody);
     } catch (err) {
         console.log(err);
         return res.status(500).json(err);

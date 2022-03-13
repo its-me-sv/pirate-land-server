@@ -136,4 +136,22 @@ router.put("/set_current_game", async (req, res) => {
   }
 });
 
+// get username of user
+router.post("/username", async (req, res) => {
+  const {userId} = req.body;
+
+  const QUERY = `SELECT username FROM users WHERE id = ?;`;
+  const VALUES = [userId];
+
+  try {
+    const {rowLength,rows} = await client.execute(QUERY, VALUES);
+    if (!rowLength)
+      return res.status(400).json("Account not found");
+    return res.status(200).json(rows[0]);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json(err);
+  }
+});
+
 module.exports = router;
