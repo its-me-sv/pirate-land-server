@@ -19,4 +19,29 @@ router.post(`/get_board`, async (req, res) => {
     }
 });
 
+router.put(`/update_board`, async (req, res) => {
+    try {
+        const {currTeamId, typ, idx, oppTeamId, initial} = req.body;
+        // fetching team board
+        let QUERY = `SELECT board FROM boards WHERE id = ?;`;
+        let VALUE = [currTeamId];
+        let teamBoard = (await client.execute(QUERY, VALUE)).rows[0].board;
+        // set team board
+        teamBoard = teamBoard.split(',').map(v => Number(v));
+        teamBoard[idx] = typ;
+        teamBoard = teamBoard.join();
+        // update team board
+        QUERY = `UPDATE boards SET board = ? WHERE id = ?;`;
+        VALUE = [teamBoard, currTeamId];
+        await client.execute(QUERY, VALUE);
+        // check initiality
+        if (initial) return res.status(200).json("Board updated successfully");
+        // fetch opp team board
+        return res.status(200).json("Board updated successfully");
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json(err);
+    }
+});
+
 module.exports = router;

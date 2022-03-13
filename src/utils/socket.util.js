@@ -88,6 +88,11 @@ const socketHandler = io => {
             socket.broadcast.to(roomId).emit("gameLaunched");
             console.log(`[SERVER] ${socket.id} launched in ${roomId}`);
         })
+        // user updates board
+        socket.on("updateBoard", roomId => {
+            socket.broadcast.to(roomId).emit("updateBoard", roomId.replace('LOBBY:', ''));
+            console.log(`[SERVER] ${socket.id} updates ${roomId}`);
+        })
     });
 };
 
