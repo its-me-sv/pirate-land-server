@@ -87,12 +87,17 @@ const socketHandler = io => {
         socket.on("gameLaunched", roomId => {
             socket.broadcast.to(roomId).emit("gameLaunched");
             console.log(`[SERVER] ${socket.id} launched in ${roomId}`);
-        })
+        });
         // user updates board
         socket.on("updateBoard", roomId => {
-            socket.broadcast.to(roomId).emit("updateBoard", roomId.replace('LOBBY:', ''));
+            socket.broadcast.to(roomId).emit("updateBoard", roomId);
             console.log(`[SERVER] ${socket.id} updates ${roomId}`);
-        })
+        });
+        // user updates chance to all
+        socket.on("updateChance", roomId => {
+            socket.broadcast.to(roomId).emit("updateChance");
+            console.log(`[SERVER] ${socket.id} updates ${roomId}`);
+        });
     });
 };
 

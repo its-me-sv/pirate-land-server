@@ -198,4 +198,54 @@ router.post(`/init_fetch`, async (req, res) => {
     }
 });
 
+// update chance_off
+router.put(`/update_chance`, async (req, res) => {
+    try {
+        const {gameId} = req.body;
+
+        // retrieve chance_off, initial and players
+        let QUERY = `SELECT chance_off, initial, players FROM games WHERE id = ?;`;
+        let VALUE = [gameId];
+        let {chance_off, initial, players} = (await client.execute(QUERY, VALUE)).rows[0];
+        
+        // incrementing and reseting values
+        chance_off += 1;
+        if (chance_off >= players.length) {
+            chance_off = 0;
+            if (initial === true) initial = false;
+        }
+
+        // console.log({chance_off, initial, gameId});
+        // console.log({
+        //     chance_off: typeof (chance_off), 
+        //     initial: typeof (initial), 
+        //     gameId: typeof (gameId)
+        // });
+
+        // update game
+        QUERY = `UPDATE games SET chance_off = ?, initial = ? WHERE id = ?;`;
+        VALUE = [chance_off, initial, gameId];
+        await client.execute(QUERY, VALUE, {prepare: true});
+
+        return res.status(200).json("game updated");
+
+    } catch (err) {
+        // console.log(err);
+        return res.status(500).json(err);
+    }
+});
+
+// get chance_off and initial
+router.post(`/get_chance`, async (req, res) => {
+    try {
+        const {gameId} = req.body;
+        const QUERY = `SELECT chance_off, initial FROM games WHERE id = ?;`;
+        const VALUE = [gameId];
+        const {rows} = await client.execute(QUERY, VALUE);
+        return res.status(200).json(rows[0]);
+    } catch (err) {
+        return res.status(500).json(err);
+    }
+});
+
 module.exports = router;
