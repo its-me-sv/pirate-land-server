@@ -37,6 +37,7 @@ router.put(`/update_board`, async (req, res) => {
         // check initiality
         if (initial) return res.status(200).json("Board updated successfully");
         // fetch opp team board
+        console.log("game time now");
         return res.status(200).json("Board updated successfully");
     } catch (err) {
         console.log(err);
