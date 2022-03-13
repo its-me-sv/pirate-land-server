@@ -151,11 +151,27 @@ router.put(`/launch_game`, async (req, res) => {
         QUERY = `INSERT INTO scoreboards (id, created_at, team1, team2) VALUES (?, now(), ?, ?);`;
         VALUE = [gameId, t1s, t2s];
         await client.execute(QUERY, VALUE, {prepare: true});
+        // create the boards
+        QUERY = `INSERT INTO boards (id, board) VALUES (?, ?);`;
+        VALUE = [t1id];
+        await client.execute(QUERY, VALUE);
+        VALUE = [t2id];
+        await client.execute(QUERY, VALUE);
         // update the game
-        QUERY = `UPDATE games SET launched = true, chance_off = 0, players = ? WHERE id = ?`;
+        QUERY = `UPDATE games SET initial = true, launched = true, chance_off = 0, players = ? WHERE id = ?`;
         VALUE = [allPlayers, gameId];
         await client.execute(QUERY, VALUE);
         return res.status(200).json("Launched game successfully");
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json(err);
+    }
+});
+
+// initial fetch for game
+router.post(`/init_fetch`, async (req, res) => {
+    try {
+
     } catch (err) {
         console.log(err);
         return res.status(500).json(err);
