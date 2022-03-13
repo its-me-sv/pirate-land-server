@@ -133,12 +133,31 @@ router.put(`/leave_team`, async (req, res) => {
 // launch game
 router.put(`/launch_game`, async (req, res) => {
     try {
-        const {gameId} = req.body;
-        const QUERY = `UPDATE games SET launched = true, chance_off = 0 WHERE id = ?`;
-        const VALUE = [gameId];
+        const {gameId, allPlayers} = req.body;
+        // get id of teams being played
+        let QUERY = `SELECT team1, team2 FROM games WHERE id = ?`;
+        let VALUE = [gameId];
+        const {team1: t1id, team2: t2id} = (await client.execute(QUERY, VALUE)).rows[0];
+        // get players of team1 and team2, map score
+        QUERY = `SELECT players FROM teams WHERE id = ?`;
+        VALUE = [t1id];
+        const {players: t1p} = (await client.execute(QUERY, VALUE)).rows[0];
+        const t1s = t1p.map(val => ({pid: val, captures: 0, caught: 0}));
+        QUERY = `SELECT players FROM teams WHERE id = ?`;
+        VALUE = [t2id];
+        const {players: t2p} = (await client.execute(QUERY, VALUE)).rows[0];
+        const t2s = t2p.map(val => ({pid: val, captures: 0, caught: 0}));
+        // create the scoreboard
+        QUERY = `INSERT INTO scoreboards (id, created_at, team1, team2) VALUES (?, now(), ?, ?);`;
+        VALUE = [gameId, t1s, t2s];
+        await client.execute(QUERY, VALUE, {prepare: true});
+        // update the game
+        QUERY = `UPDATE games SET launched = true, chance_off = 0, players = ? WHERE id = ?`;
+        VALUE = [allPlayers, gameId];
         await client.execute(QUERY, VALUE);
         return res.status(200).json("Launched game successfully");
     } catch (err) {
+        console.log(err);
         return res.status(500).json(err);
     }
 });
