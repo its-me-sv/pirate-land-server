@@ -47,7 +47,7 @@ router.put(`/update_board`, async (req, res) => {
 
 router.put(`/make_move`, async (req, res) => {
     try {
-        const {currTeamId, typ, idx, oppTeamId} = req.body;
+        const {currTeamId, idx, oppTeamId, gameId, currTeam, mTyp} = req.body;
         // fetching team board and converting it
         let QUERY = `SELECT board FROM boards WHERE id = ?;`;
         let VALUE = [currTeamId];
@@ -76,7 +76,29 @@ router.put(`/make_move`, async (req, res) => {
         // updating opp team board
         VALUE = [oppTeamBoard, oppTeamId];
         await client.execute(QUERY, VALUE);
-        return res.status(200).json("hit");
+        // updating the scores
+        // get scores
+        QUERY = `SELECT team1, team2 FROM scoreboards WHERE id = ?;`;
+        VALUE = [gameId];
+        let scores = (await client.execute(QUERY, VALUE)).rows[0];
+        scores = JSON.parse(JSON.stringify(scores));
+        // set team score and opp scores
+        let teamScore = [];
+        let oppTeamScore = [];
+        if (currTeam == 'Team 1') {
+            teamScore = scores.team1;
+            oppTeamScore = scores.team2;
+        } else {
+            teamScore = scores.team2;
+            oppTeamScore = scores.team1;
+        }
+        // finding my score and opp
+        // score using mtyp and oppTyp
+
+        // updating mine and opponents scores
+
+        // updating the scores
+        return res.status(200).json(teamScore);
     } catch (err) {
         console.log(err);
         return res.status(500).json(err);
