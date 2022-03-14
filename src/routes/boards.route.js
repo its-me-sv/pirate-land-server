@@ -94,11 +94,27 @@ router.put(`/make_move`, async (req, res) => {
         }
         // finding my score and opp
         // score using mtyp and oppTyp
-
+        const myScore = teamScore[mTyp-1];
+        myScore.captures += 1;
+        const oppScore = oppTeamScore[oppTyp-1];
+        oppScore.caught += 1;
         // updating mine and opponents scores
-
+        teamScore[mTyp-1] = myScore;
+        oppTeamScore[oppTyp-1] = oppScore;
         // updating the scores
-        return res.status(200).json(teamScore);
+        let team1Score = [];
+        let team2Score = [];
+        if (currTeam == 'Team 1') {
+            team1Score = teamScore;
+            team2Score = oppTeamScore;
+        } else {
+            team1Score = oppTeamScore;
+            team2Score = teamScore;
+        }
+        QUERY = `UPDATE scoreboards SET team1 = ?, team2 = ? WHERE id = ?;`;
+        VALUE = [team1Score, team2Score, gameId];
+        await client.execute(QUERY, VALUE, {prepare: true});
+        return res.status(200).json("hit");
     } catch (err) {
         console.log(err);
         return res.status(500).json(err);
