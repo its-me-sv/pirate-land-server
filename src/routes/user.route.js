@@ -162,6 +162,14 @@ router.put("/set_last_game", async (req, res) => {
     const BQ = `SELECT username FROM users WHERE id = ?;`;
     const BV = [id];
     const username = (await client.execute(BQ, BV)).rows[0].username;
+    const QUERY1 = `UPDATE users SET current_game = ? WHERE username = ? AND id = ?;`;
+    const VALUES1 = [null, username, id];
+    await client.execute(QUERY1, VALUES1);
+    const BQ1 = `SELECT games FROM users WHERE id = ?;`;
+    const BQ2 = [id];
+    const {rows, rowLength} = await client.execute(BQ1, BQ2);
+    if (rowLength && rows && rows[0].games?.includes(gameId))
+      return res.status(200).json("Updated current game successfully");
     const QUERY = `UPDATE users SET current_game = ?, games = games + ? WHERE username = ? AND id = ?;`;
     const VALUES = [null, [gameId], username, id];
     await client.execute(QUERY, VALUES);
