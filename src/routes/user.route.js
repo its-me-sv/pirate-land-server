@@ -154,4 +154,22 @@ router.post("/username", async (req, res) => {
   }
 });
 
+// update last game
+router.put("/set_last_game", async (req, res) => {
+  const id = req.userId;
+  const {gameId} = req.body;
+  try {
+    const BQ = `SELECT username FROM users WHERE id = ?;`;
+    const BV = [id];
+    const username = (await client.execute(BQ, BV)).rows[0].username;
+    const QUERY = `UPDATE users SET current_game = ?, games = games + ? WHERE username = ? AND id = ?;`;
+    const VALUES = [null, [gameId], username, id];
+    await client.execute(QUERY, VALUES);
+    return res.status(200).json("Updated current game successfully");
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json(err);
+  }
+});
+
 module.exports = router;

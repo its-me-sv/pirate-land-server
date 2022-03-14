@@ -248,4 +248,18 @@ router.post(`/get_chance`, async (req, res) => {
     }
 });
 
+// finish game
+router.put(`/finish_game`, async (req, res) => {
+    try {
+        const {gameId} = req.body;
+        const QUERY = `UPDATE games SET initial = false, is_ended = false, launched = false WHERE id = ?;`;
+        const VALUE = [gameId];
+        await client.execute(QUERY, VALUE);
+        return res.status(200).json("Updated game successfully");
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json(err);
+    }
+});
+
 module.exports = router;
