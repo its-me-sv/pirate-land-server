@@ -100,7 +100,7 @@ router.post("/check_game", async (req, res) => {
   try {
     const {rows} = await client.execute(QUERY, VALUES);
     const {games} = JSON.parse(JSON.stringify(rows[0]));
-    return res.status(200).json({canShow: games.includes(gameId)});
+    return res.status(200).json({canShow: (games||[]).includes(gameId)});
   } catch (err) {
     console.log(err);
     return res.status(500).json(err);

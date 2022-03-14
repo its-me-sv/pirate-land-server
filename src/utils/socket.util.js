@@ -98,6 +98,11 @@ const socketHandler = io => {
             socket.broadcast.to(roomId).emit("updateChance");
             console.log(`[SERVER] ${socket.id} updates ${roomId}`);
         });
+        // user updates every board
+        socket.on("updtBrd", roomId => {
+            socket.broadcast.to(roomId).emit("updtBrd");
+            console.log(`[SERVER] ${socket.id} updates ${roomId}`);
+        });
     });
 };
 
