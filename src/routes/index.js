@@ -6,6 +6,7 @@ const scoreboard = require('./scoreboard.route');
 const games = require('./games.route');
 const boards = require('./boards.route');
 const teams = require('./teams.route');
+const messages = require('./messages.route');
 
 // combining all custom routes
 const combineRoutes = app => {
@@ -16,6 +17,7 @@ const combineRoutes = app => {
     app.use("/api/games", games);
     app.use("/api/boards", boards);
     app.use("/api/teams", teams);
+    app.use("/api/messages", messages);
 };
 
 module.exports = combineRoutes;
