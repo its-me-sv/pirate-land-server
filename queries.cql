@@ -36,13 +36,12 @@ CREATE TABLE teams (
     PRIMARY KEY (id)
 );
 CREATE TABLE messages (
-    id UUID,
+    id TIMEUUID,
     chat_id UUID,
     sender_id UUID,
     message TEXT,
-    created_at TIMEUUID,
-    PRIMARY KEY ((id, chat_id), created_at)
-) WITH CLUSTERING ORDER BY (created_at DESC);
+    PRIMARY KEY (chat_id, id)
+) WITH CLUSTERING ORDER BY (id DESC);
 CREATE TABLE boards (
     id UUID,
     board TEXT,
