@@ -3,6 +3,8 @@ const router = require("express").Router();
 
 // custom
 const client = require("../utils/astra-database.util");
+const timeuuid = require("cassandra-driver").types.TimeUuid;
+
 
 // get messages by chat id
 router.post(`/by_chat_id`, async (req, res) => {
@@ -26,13 +28,19 @@ router.post(`/by_chat_id`, async (req, res) => {
 router.post(`/new`, async (req, res) => {
     try {
         const {chatId, msg} = req.body;
+        const messageId = timeuuid.now();
         const QUERY = `
           INSERT INTO messages (id, chat_id, sender_id, message)
           VALUES (now(), ?, ?, ?);
         `;
         const VALUE = [chatId, req.userId, msg];
         await client.execute(QUERY, VALUE);
-        return res.status(200).json("Message has been added");
+        const resVal = {
+            id: messageId,
+            message: msg,
+            sender_id: req.userId
+        };
+        return res.status(200).json(resVal);
     } catch (err) {
         return res.status(500).json(err);
     }
