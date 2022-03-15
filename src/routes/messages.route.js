@@ -25,7 +25,14 @@ router.post(`/by_chat_id`, async (req, res) => {
 // add new message
 router.post(`/new`, async (req, res) => {
     try {
-
+        const {chatId, msg} = req.body;
+        const QUERY = `
+          INSERT INTO messages (id, chat_id, sender_id, message)
+          VALUES (now(), ?, ?, ?);
+        `;
+        const VALUE = [chatId, req.userId, msg];
+        await client.execute(QUERY, VALUE);
+        return res.status(200).json("Message has been added");
     } catch (err) {
         return res.status(500).json(err);
     }
