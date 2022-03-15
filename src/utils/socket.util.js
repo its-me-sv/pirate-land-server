@@ -103,6 +103,11 @@ const socketHandler = io => {
             socket.broadcast.to(roomId).emit("updtBrd");
             console.log(`[SERVER] ${socket.id} updates ${roomId}`);
         });
+        // user updates team chat
+        socket.on("updtTmChat", ({roomId, msgObj}) => {
+            socket.broadcast.to(roomId).emit("updtTmChat", msgObj);
+            console.log(`[SERVER] ${socket.id} updates ${roomId}`);
+        });
     });
 };
 
